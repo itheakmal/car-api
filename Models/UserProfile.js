@@ -18,8 +18,8 @@ const UserProfile = sequelize.define('UserProfile', {
  * @param {number} age - User age
  * @returns {Promise<UserProfile>} - Created user profile
  */
-UserProfile.createProfile = async (name, age) => {
-  const userProfile = await UserProfile.create({ name, age });
+UserProfile.createProfile = async (data) => {
+  const userProfile = await UserProfile.create(data);
   return userProfile;
 };
 

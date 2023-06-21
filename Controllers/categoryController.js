@@ -24,7 +24,7 @@ const createCategory = async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
     try {
-        const category = await Category.create({ name: value.name });
+        const category = await Category.createCategory(value.name);
         res.status(201).json(category);
     } catch (error) {
         res.status(500).json({ message: 'Failed to create category' });

@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const UserAuth = require('../Models/UserAuth');
 const UserProfile = require('../Models/UserProfile');
+const emailService = require('../Services/Email')
 
 // const xss = require('xss');
 
@@ -24,13 +25,14 @@ const registerUser = async (req, res) => {
         const password = UserAuth.generatePassword();
 
         // create a new user and Hash the password
-        const user = await UserAuth.createHashedUser(value.email, password);
-
+        const _user = await UserAuth.createHashedUser(value.email, password);
+        const _profile = await UserProfile.createProfile({name: value.name});
+        console.log('_profile===============================>', _profile)
         // Send email to the user
-        await emailService.sendEmail(user, password);
+        await emailService.sendEmail(_profile.name, _user.email, password);
 
         res.status(201).json({
-            id: user.id,
+            id: _user.id,
             message: 'User registered successfully'
         });
     } catch (error) {
@@ -59,7 +61,7 @@ const loginUser = async (req, res) => {
     }
 
     // Create a JWT token using the user id and username and the secret key from the environment variable
-    const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, {expiresIn: 60 * 60 * 24 * 365});
 
     // Return a 200 OK response with the token
     res.json({ token });

@@ -11,7 +11,7 @@ const { createCategory, getCategory, updateCategory, deleteCategory } = require(
  */
 
 router.post('/register', registerUser)
-router.post('/login', authenticateToken, loginUser)
+router.post('/login', loginUser)
 
 router.get('/cars', authenticateToken, getCars)
 router.post('/car', authenticateToken, createCar)
