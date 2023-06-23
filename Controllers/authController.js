@@ -18,7 +18,7 @@ const registerUser = async (req, res) => {
     // if email exists
     const exists = await UserAuth.findByEmail(value.email)
     if (exists) {
-        return res.status(401).json({ message: 'Email already registered' });
+        return res.status(403).json({ message: 'Email already registered' });
     }
     try {
         // get a random password
@@ -27,7 +27,6 @@ const registerUser = async (req, res) => {
         // create a new user and Hash the password
         const _user = await UserAuth.createHashedUser(value.email, password);
         const _profile = await UserProfile.createProfile({name: value.name});
-        console.log('_profile===============================>', _profile)
         // Send email to the user
         await emailService.sendEmail(_profile.name, _user.email, password);
 
@@ -51,13 +50,13 @@ const loginUser = async (req, res) => {
 
     const user = await UserAuth.findByEmail(value.email)
     if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(403).json({ message: 'Invalid credentials' });
     }
 
 
     const match = await bcrypt.compare(value.password, user.password);
     if (!match) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(403).json({ message: 'Invalid credentials' });
     }
 
     // Create a JWT token using the user id and username and the secret key from the environment variable

@@ -24,11 +24,12 @@ const UserAuth = db.define('UserAuth', {
  * Schema for validating user registration input
  * Name of the user (required)
  * Email of the user (required and must be a valid email)
- * Password of the user (required and must have a minimum length of 8 characters)
+ * age
  */
 const registerSchema = joi.object({
   name: joi.string().required(),
   email: joi.string().email().required(),
+  age: joi.number().integer().min(18).max(100).required()
 });
 
 const loginSchema = joi.object({

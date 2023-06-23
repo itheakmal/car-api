@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./index');
+const UserAuth = require('./UserAuth');
 
 const UserProfile = sequelize.define('UserProfile', {
   name: {
@@ -11,6 +12,9 @@ const UserProfile = sequelize.define('UserProfile', {
     allowNull: true
   }
 });
+
+UserAuth.hasOne(UserProfile, { foreignKey: 'userAuthId', onDelete: 'CASCADE' });
+UserProfile.belongsTo(UserAuth, { foreignKey: 'userAuthId' });
 
 /**
  * Create user profile

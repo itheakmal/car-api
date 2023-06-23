@@ -1,16 +1,27 @@
 const Car = require('../Models/Car');
 const Category = require('../Models/Category');
+const UserAuth = require('../Models/UserAuth');
+const UserProfile = require('../Models/UserProfile');
 /**
  * Get all cars
  * @returns {Promise<Car[]>} - All cars
  */
 const getCars = async (req, res) => {
-    try {
-        const cars = await Car.findAll();
-        res.json(cars);
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch cars' });
-    }
+    // try {
+    const cars = await Car.findAll({
+        include: [
+            { model: Category, attributes: ['name'] },
+            {
+                model: UserAuth,
+                attributes: ['email'],
+                include: [{model: UserProfile, attributes: ['name']}]
+            }
+        ],
+    });
+    res.json(cars);
+    // } catch (error) {
+    // res.status(500).json({ message: 'Failed to fetch cars' });
+    // }
 };
 
 /**

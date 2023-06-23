@@ -24,51 +24,27 @@ const smtpTransport = nodemailer.createTransport({
   }
 });
 
-// const mailOptions = {
-//   from: "devahmadj@gmail.com",
-//   to: "some.other.email@gmail.com",
-//   subject: "Node.js Email with Secure OAuth",
-//   generateTextFromHTML: true,
-//   html: "<b>test</b>"
-// };
-
-
-// SMTP credentials
-// const transporter = nodemailer.createTransport({
-//   host: 'smtp.gmail.com',
-//   port: 465,
-//   secure: true,
-//   auth: {
-//     user: 'devahmadj@gmail.com',
-//     pass: 'Mutaal@2468'
-//   }
-// });
 
 /**
  * 
  * @param {Object} user 
  * @param {String} password 
  */
-const sendEmail = async (email, name, password) => {
+const sendEmail = async (name, email, password) => {
+  console.log(email, name, password)
   const mailOptions = {
     from: 'devahmadj@gmail.com',
-    to: email,
+    to: `${email}`,
     subject: 'Your password for Cars System authentication',
     generateTextFromHTML: true,
     html: `Hello ${name},\n\nYour password for Cars System authentication is ${password}.\n\nPlease change it, if you feel like it :) .\n\nThank you.`
   };
-  // try {
-
-  smtpTransport.sendMail(mailOptions, (error, response) => {
-    error ? console.log(error) : console.log(response);
-    smtpTransport.close();
-  });
-
-  //   await smtpTransport.sendMail(mailOptions);
-  //   console.log('Email sent successfully');
-  // } catch (error) {
-  //   console.error('Error sending email:', error);
-  // }
+  try {
+    await smtpTransport.sendMail(mailOptions);
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
 };
 
 module.exports = {
