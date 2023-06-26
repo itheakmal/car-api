@@ -16,6 +16,16 @@ app.use(express.json());
 
 // routes
 app.use('/api/v1/', routes);
+// Error handling 
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(err.status || 500);
+    res.json({
+      error: {
+        message: err.message,
+      },
+    });
+  });
 
 // Start the server on port 3000
 app.listen(process.env.CARS_PORT, () => {

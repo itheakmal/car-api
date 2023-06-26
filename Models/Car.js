@@ -50,7 +50,7 @@ Car.carValidate = (input) => {
  * @returns {Promise<Car>} - Created car
  */
 Car.createCar = async (color, make, model, registrationNo, userAuthId, categoryId) => {
-    const car = await Car.create({ color, make, model, registrationNo, userAuthId, categoryId });
+    const car = await Car.create({ color, make, model, registrationNo, UserAuthId:userAuthId, CategoryId:categoryId });
     return car;
 };
 

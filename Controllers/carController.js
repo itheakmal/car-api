@@ -7,22 +7,24 @@ const UserProfile = require('../Models/UserProfile');
  * @returns {Promise<Car[]>} - All cars
  */
 const getCars = async (req, res) => {
-    // try {
-    const cars = await Car.findAll({
-        include: [
-            { model: Category, attributes: ['name'] },
-            {
-                model: UserAuth,
-                attributes: ['email'],
-                include: [{model: UserProfile, attributes: ['name']}]
-            }
-        ],
-    });
-    res.json(cars);
-    // } catch (error) {
-    // res.status(500).json({ message: 'Failed to fetch cars' });
-    // }
+    try {
+        const cars = await Car.findAll({
+            where: { UserAuthId: req.user.id },
+            include: [
+                { model: Category, attributes: ['name'] },
+                {
+                    model: UserAuth,
+                    attributes: ['email'],
+                    include: [{ model: UserProfile, attributes: ['name'] }]
+                }
+            ],
+        });
+        res.json(cars);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch cars' });
+    }
 };
+
 
 /**
  * Create a new car
@@ -34,6 +36,8 @@ const getCars = async (req, res) => {
  * @returns {Promise<Car>} - Created car
  */
 const createCar = async (req, res) => {
+    console.log('first', req.body)
+    console.log('first', req.user.id)
     // validate req
     const { error, value } = Car.carValidate(req.body);
     if (error) {
@@ -44,11 +48,12 @@ const createCar = async (req, res) => {
     try {
         // Check if the specified category exists
         const category = await Category.findByPk(value.categoryId);
+        console.log(category)
         if (!category) {
             return res.status(404).json({ message: 'Category not found' });
         }
 
-        const car = await Car.createCar(value.color, value.make, value.registrationNo, req.user.id, value.categoryId);
+        const car = await Car.createCar(value.color, value.make, value.model, value.registrationNo, req.user.id, value.categoryId);
 
         res.status(201).json(car);
     } catch (error) {
@@ -58,7 +63,7 @@ const createCar = async (req, res) => {
 
 /**
  * Update a car
- * @param {number} carId - Car ID
+ * @param {number} id - Car ID
  * @param {number} categoryId - Updated category ID for the car
  * @param {string} color - Updated car color
  * @param {string} model - Updated car model
@@ -67,7 +72,7 @@ const createCar = async (req, res) => {
  * @returns {Promise<Car>} - Updated car
  */
 const updateCar = async (req, res) => {
-    const { carId } = req.params;
+    const { id } = req.params;
     // validate req
     const { error, value } = Car.carValidate(req.body);
     if (error) {
@@ -76,13 +81,15 @@ const updateCar = async (req, res) => {
 
 
     try {
-        const car = await Car.findByPk(carId);
+        const car = await Car.findByPk(id);
         if (!car) {
             return res.status(404).json({ message: 'Car not found' });
+        } else if (car.UserAuthId !== req.user.id) {
+            return res.status(403).json({ message: 'Not Allowed' });
         }
 
         // Check if the specified category exists
-        const category = await Category.findByPk(categoryId);
+        const category = await Category.findByPk(value.categoryId);
         if (!category) {
             return res.status(404).json({ message: 'Category not found' });
         }
@@ -102,16 +109,18 @@ const updateCar = async (req, res) => {
 
 /**
  * Delete a car
- * @param {number} carId - Car ID
+ * @param {number} id - Car ID
  * @returns {Promise} - Empty response
  */
 const deleteCar = async (req, res) => {
-    const { carId } = req.params;
+    const { id } = req.params;
 
     try {
-        const car = await Car.findByPk(carId);
+        const car = await Car.findByPk(id);
         if (!car) {
             return res.status(404).json({ message: 'Car not found' });
+        } else if (car.UserAuthId !== req.user.id) {
+            return res.status(403).json({ message: 'Not Allowed' });
         }
 
         await car.destroy();
@@ -122,9 +131,34 @@ const deleteCar = async (req, res) => {
     }
 };
 
+/**
+ * Get a car by id
+ * @returns {Promise<Car[]>} - All cars
+ */
+const getCarById = async (req, res) => {
+    console.log(req.params)
+    try {
+    const car = await Car.findOne({
+        where: { id: req.params.id },
+        include: [
+            { model: Category, attributes: ['name'] },
+            {
+                model: UserAuth,
+                attributes: ['email'],
+                include: [{ model: UserProfile, attributes: ['name'] }]
+            }
+        ],
+    });
+    res.json(car);
+    } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch cars' });
+    }
+};
+
 module.exports = {
     getCars,
     createCar,
     updateCar,
-    deleteCar
+    deleteCar,
+    getCarById
 }

@@ -33,19 +33,19 @@ const createCategory = async (req, res) => {
 
 /**
  * Update a category
- * @param {number} categoryId - Category ID
+ * @param {number} id - Category ID
  * @param {string} name - Updated category name
  * @returns {Promise<Category>} - Updated category
  */
 const updateCategory = async (req, res) => {
-    const { categoryId } = req.params;
+    const { id } = req.params;
     // validate req
     const { error, value } = Category.categoryValidate(req.body);
     if (error) {
         return res.status(400).json({ message: error.message });
     }
     try {
-        const category = await Category.findByPk(categoryId);
+        const category = await Category.findByPk(id);
         if (!category) {
             return res.status(404).json({ message: 'Category not found' });
         }
@@ -61,14 +61,14 @@ const updateCategory = async (req, res) => {
 
 /**
  * Delete a category
- * @param {number} categoryId - Category ID
+ * @param {number} id - Category ID
  * @returns {Promise} - Empty response
  */
 const deleteCategory = async (req, res) => {
-    const { categoryId } = req.params;
+    const { id } = req.params;
 
     try {
-        const category = await Category.findByPk(categoryId);
+        const category = await Category.findByPk(id);
         if (!category) {
             return res.status(404).json({ message: 'Category not found' });
         }
@@ -80,10 +80,22 @@ const deleteCategory = async (req, res) => {
         res.status(500).json({ message: 'Failed to delete category' });
     }
 };
-
+const getCategoryById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const category = await Category.findByPk(id);
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+        res.json(category);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to update category' });
+    }
+};
 module.exports = {
     getCategory,
     createCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    getCategoryById
 }

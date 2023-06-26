@@ -26,7 +26,8 @@ const registerUser = async (req, res) => {
 
         // create a new user and Hash the password
         const _user = await UserAuth.createHashedUser(value.email, password);
-        const _profile = await UserProfile.createProfile({name: value.name});
+        console.log(_user)
+        const _profile = await UserProfile.createProfile({name: value.name, age: value.age, userAuthId: _user.id});
         // Send email to the user
         await emailService.sendEmail(_profile.name, _user.email, password);
 

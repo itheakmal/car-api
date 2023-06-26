@@ -40,7 +40,7 @@ const loginSchema = joi.object({
 /**
  * Validate the input data for user login
  * @param {object} input - Input data for login
- * @returns {Joi.ValidationResult} - Validation result of login input
+ * @returns {joi.ValidationResult} - Validation result of login input
  */
 UserAuth.loginValidate = (input) => {
   return loginSchema.validate(input);
